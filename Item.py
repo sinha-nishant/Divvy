@@ -28,6 +28,6 @@ class Item:
     def __repr__(self) -> str:
         message = ""
         message += "Food: " + self.__name
-        message += "\n\tPrice: $" + str(self.__unit_price)
-        message += "\n\tQuantity: " + str(self.__quantity)
+        message += "\n\t\tPrice: $" + str(self.__unit_price)
+        message += "\n\t\tQuantity: " + str(self.__quantity)
         return message

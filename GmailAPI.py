@@ -1,9 +1,6 @@
-import base64
-import email
-import pickle
-import os.path
-import re
+import base64, email, pickle, os.path, re
 from typing import List, Dict
+from datetime import datetime
 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -63,17 +60,19 @@ def main():
         orders.append(message)
 
     # Parts is of size 2, but the second is only graphics
-    parts = orders[0]['payload']['parts']
-    part0 = parts[0]['body']['data']
+    parts : List[Dict] = orders[5]['payload']['parts']
+    part0 : str = parts[0]['body']['data']
     body = base64.urlsafe_b64decode(part0)
-    em = email.message_from_bytes(body).as_string()
+    em : str = email.message_from_bytes(body).as_string()
+    restaurant : str = em[:em.index('Total')].strip().split('\n')[-1].strip()
+    transaction_date : str = orders[5]['payload']['headers'][1]['value'].split(';')[-1].strip()
     del orders, part0, body
 
     findNames = re.compile('- For: \w+ \w+ -')
-    raw_names = findNames.findall(em)
+    raw_names: List[str] = findNames.findall(em)
     member_names = re.findall('\w+ \w+', "".join(raw_names))
 
-    subOrders = re.split('- For: \w+ \w+ -', em)
+    subOrders : List[str] = re.split('- For: \w+ \w+ -', em)
     dollar = re.compile('\$\d+(?:\.\d+)?')
     total_cost = float(dollar.findall(subOrders[0])[0].lstrip('$'))
     del subOrders[0]
@@ -104,7 +103,14 @@ def main():
     for key in memberToItems.keys():
         members.append(Member(key, memberToItems[key]))
 
-    order = Order('2/2/2020', 'Test Rest', members, total_cost)
+    subtotal : int = 0
+    for member in members:
+        subtotal += member.getNoTaxTotal()
+
+    for i in range(len(members)):
+        members[i].setTotal((members[i].getNoTaxTotal()/subtotal) * total_cost)
+
+    order : Order = Order(datetime.strptime(transaction_date, '%a, %d %b %Y %H:%M:%S %z (%Z)'), restaurant, members, total_cost)
 
     print(order)
 
