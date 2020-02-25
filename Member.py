@@ -1,30 +1,34 @@
+from typing import List
+from Item import Item
 class Member:
-    def __init__(self, name = "", items = None):
+    def __init__(self, name : str = "", items : List[Item] = None):
         # String name of user
-        self.__name = name
+        self.__name : str = name
         # List of Item objects
-        self.__items = items
+        self.__items : List[Item] = items
 
-    def getName(self):
+    # Returns name of participant
+    def getName(self) -> str:
         return self.__name
 
-    def setName(self, name):
+    def setName(self, name : str):
         self.__name = name
 
-    def getItems(self):
+    def getItems(self) -> List[Item]:
         return self.__items
 
-    def setItems(self, items):
+    def setItems(self, items : List[Item]):
         self.__items = items
 
-    def getTotal(self):
-        total = 0
+    # Returns total value of items a participant ordered
+    def getTotal(self) -> float:
+        total : int = 0
         for item in self.__items:
             item_value = item.getUnitPrice() * item.getQuantity()
             total += item_value
         return total
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         message = ""
         message += self.__name + " ordered:"
         for item in self.__items:
