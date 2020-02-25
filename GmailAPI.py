@@ -76,18 +76,22 @@ def main():
     # for name in raw_names:
     #     member_names.append(raw_names)
 
+    pattern='\w+ \w+'
+    member_names=re.findall(pattern, "".join(raw_names))
+
+
     members = re.split('- For: \w+ \w+ -', em)
     total_cost = float(p.findall(members[0])[0].lstrip('$'))
     del members[0]
 
     members[-1] = members[-1][:members[-1].index('Subtotal')]
     subtotals = dict()
-    for i in range(len(raw_names)):
+    for i in range(len(member_names)):
         for item in p.findall(members[i]):
-            if raw_names[i] not in subtotals.keys():
-                subtotals[raw_names[i]] = [float(item.lstrip('$'))]
+            if member_names[i] not in subtotals.keys():
+                subtotals[member_names[i]] = [float(item.lstrip('$'))]
             else:
-                subtotals[raw_names[i]].append(float(item.lstrip('$')))
+                subtotals[member_names[i]].append(float(item.lstrip('$')))
 
     print('Total Cost:', total_cost)
     print(subtotals)
