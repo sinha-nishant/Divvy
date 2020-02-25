@@ -60,18 +60,36 @@ def main():
         orders.append(message)
 
     # Parts is of size 2, but the second is only graphics
-    parts = orders[0]['payload']['parts']
+    parts = orders[2]['payload']['parts']
     part0 = parts[0]['body']['data']
     body = base64.urlsafe_b64decode(part0)
     em = email.message_from_bytes(body).as_string()
-    # print(em)
 
     # Try to understand this line
     p = re.compile('\$\d+(?:\.\d+)?')
     # print(p.findall(em))
 
-    print(re.split('- For: \w+ \w+ -', em)[3])
+    member_names = []
+    p1 = re.compile('- For: \w+ \w+ -')
+    raw_names = p1.findall(em)
+    # Need regex for the below
+    # for name in raw_names:
+    #     member_names.append(raw_names)
 
-    # print(em)
+    members = re.split('- For: \w+ \w+ -', em)
+    total_cost = float(p.findall(members[0])[0].lstrip('$'))
+    del members[0]
+
+    members[-1] = members[-1][:members[-1].index('Subtotal')]
+    subtotals = dict()
+    for i in range(len(raw_names)):
+        for item in p.findall(members[i]):
+            if raw_names[i] not in subtotals.keys():
+                subtotals[raw_names[i]] = [float(item.lstrip('$'))]
+            else:
+                subtotals[raw_names[i]].append(float(item.lstrip('$')))
+
+    print('Total Cost:', total_cost)
+    print(subtotals)
 
 main()
