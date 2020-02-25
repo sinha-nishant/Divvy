@@ -3,6 +3,7 @@ import email
 import pickle
 import os.path
 import re
+from typing import List, Dict
 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -56,19 +57,20 @@ def main():
         response = service.users().messages().list(userId=user_id, labelIds=label_id, pageToken=page_token).execute()
         messages.extend(response['messages'])
 
-    orders = []
+    orders : List[Dict] = []
     for i in range(len(messages)):
         message = service.users().messages().get(userId=user_id, id=messages[i]['id']).execute()
         orders.append(message)
 
     # Parts is of size 2, but the second is only graphics
-    parts = orders[2]['payload']['parts']
+    parts = orders[0]['payload']['parts']
     part0 = parts[0]['body']['data']
     body = base64.urlsafe_b64decode(part0)
     em = email.message_from_bytes(body).as_string()
+    del orders, part0, body
 
-    p1 = re.compile('- For: \w+ \w+ -')
-    raw_names = p1.findall(em)
+    findNames = re.compile('- For: \w+ \w+ -')
+    raw_names = findNames.findall(em)
     member_names = re.findall('\w+ \w+', "".join(raw_names))
 
     subOrders = re.split('- For: \w+ \w+ -', em)
@@ -80,25 +82,25 @@ def main():
 
     findItem = re.compile("\dx\w+.*")
 
-    memberToItems = dict()
+    memberToItems : Dict[str: List[Item]] = dict()
     for i in range(len(member_names)):
-        prices = [float(price.lstrip('$')) for price in dollar.findall(subOrders[i])]
-        quantities = []
-        foods = []
-        raw_items = findItem.findall(subOrders[i])
+        prices : List[float] = [float(price.lstrip('$')) for price in dollar.findall(subOrders[i])]
+        quantities : List[int] = []
+        foods : List[str] = []
+        raw_items : List[str] = findItem.findall(subOrders[i])
 
         for item in raw_items:
-            elements = item.split('x', 1)
+            elements : List[str] = item.split('x', 1)
             quantities.append(int(elements[0]))
             foods.append(elements[1])
 
-        items = []
+        items : List[Item] = []
         for j in range(len(foods)):
             items.append(Item(foods[j], quantities[j], prices[j]))
 
         memberToItems[member_names[i]] = items
 
-    members = []
+    members : List[Member] = []
     for key in memberToItems.keys():
         members.append(Member(key, memberToItems[key]))
 
