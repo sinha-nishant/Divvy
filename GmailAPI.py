@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import base64
 import email
 import pickle
@@ -9,6 +7,10 @@ import re
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+
+from Order import Order
+from Member import Member
+from Item import Item
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -65,35 +67,43 @@ def main():
     body = base64.urlsafe_b64decode(part0)
     em = email.message_from_bytes(body).as_string()
 
-    # Try to understand this line
-    p = re.compile('\$\d+(?:\.\d+)?')
-    # print(p.findall(em))
-
-    member_names = []
     p1 = re.compile('- For: \w+ \w+ -')
     raw_names = p1.findall(em)
-    # Need regex for the below
-    # for name in raw_names:
-    #     member_names.append(raw_names)
+    member_names = re.findall('\w+ \w+', "".join(raw_names))
 
-    pattern='\w+ \w+'
-    member_names=re.findall(pattern, "".join(raw_names))
+    subOrders = re.split('- For: \w+ \w+ -', em)
+    dollar = re.compile('\$\d+(?:\.\d+)?')
+    total_cost = float(dollar.findall(subOrders[0])[0].lstrip('$'))
+    del subOrders[0]
 
+    subOrders[-1] = subOrders[-1][:subOrders[-1].index('Subtotal')]
 
-    members = re.split('- For: \w+ \w+ -', em)
-    total_cost = float(p.findall(members[0])[0].lstrip('$'))
-    del members[0]
+    findItem = re.compile("\dx\w+.*")
 
-    members[-1] = members[-1][:members[-1].index('Subtotal')]
-    subtotals = dict()
+    memberToItems = dict()
     for i in range(len(member_names)):
-        for item in p.findall(members[i]):
-            if member_names[i] not in subtotals.keys():
-                subtotals[member_names[i]] = [float(item.lstrip('$'))]
-            else:
-                subtotals[member_names[i]].append(float(item.lstrip('$')))
+        prices = [float(price.lstrip('$')) for price in dollar.findall(subOrders[i])]
+        quantities = []
+        foods = []
+        raw_items = findItem.findall(subOrders[i])
 
-    print('Total Cost:', total_cost)
-    print(subtotals)
+        for item in raw_items:
+            elements = item.split('x', 1)
+            quantities.append(int(elements[0]))
+            foods.append(elements[1])
+
+        items = []
+        for j in range(len(foods)):
+            items.append(Item(foods[j], quantities[j], prices[j]))
+
+        memberToItems[member_names[i]] = items
+
+    members = []
+    for key in memberToItems.keys():
+        members.append(Member(key, memberToItems[key]))
+
+    order = Order('2/2/2020', 'Test Rest', members, total_cost)
+
+    print(order)
 
 main()

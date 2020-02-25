@@ -1,5 +1,5 @@
 class Item:
-    def __init__(self, name, quantity, unit_price):
+    def __init__(self, name = "", quantity = 0, unit_price = 0):
         # String name of item
         self.__name = name
         # Integer quantity of item
@@ -24,3 +24,10 @@ class Item:
 
     def setUnitPrice(self, unit_price):
         self.__unit_price = unit_price
+
+    def __repr__(self):
+        message = ""
+        message += "Food: " + self.__name
+        message += "\n\tPrice: $" + str(self.__unit_price)
+        message += "\n\tQuantity: " + str(self.__quantity)
+        return message
