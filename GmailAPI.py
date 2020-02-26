@@ -30,8 +30,7 @@ def main():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
@@ -39,15 +38,13 @@ def main():
 
     service = build('gmail', 'v1', credentials=creds)
 
-    user_id = 'me'
-
     # Call the Gmail API
     start = time_now()
     # Personal label ID for DoorDash
     label_id : str = 'Label_1748595172489237696'
     # Retrieves most recent email with the label DoorDash
-    response = service.users().messages().list(userId = user_id, labelIds = label_id, maxResults = 1).execute()
-    order = service.users().messages().get(userId=user_id, id=response['messages'][0]['id']).execute()
+    response = service.users().messages().list(userId = 'me', labelIds = label_id, maxResults = 4).execute()
+    order = service.users().messages().get(userId = 'me', id = response['messages'][3]['id']).execute()
     print('API Response time:', time_now() - start, 'seconds')
     start = time_now()
 
@@ -65,7 +62,7 @@ def main():
 
     subOrders : List[str] = re.split('- For: \w+ \w+ -', em)
     dollar = re.compile('\$\d+(?:\.\d+)?')
-    total_cost = float(dollar.findall(subOrders[0])[0].lstrip('$'))
+    total_cost = float(dollar.search(subOrders[0]).group().lstrip('$'))
     del subOrders[0]
 
     subOrders[-1] = subOrders[-1][:subOrders[-1].index('Subtotal')]
@@ -84,9 +81,7 @@ def main():
             quantities.append(int(elements[0]))
             foods.append(elements[1])
 
-        items : List[Item] = []
-        for j in range(len(foods)):
-            items.append(Item(foods[j], quantities[j], prices[j]))
+        items : List[Item] = [Item(food, quantity, price) for food in foods for quantity in quantities for price in prices]
         memberToItems[member_names[i]] = items
 
     members : List[Member] = [Member(key, memberToItems[key]) for key in memberToItems.keys()]
