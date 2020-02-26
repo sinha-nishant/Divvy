@@ -17,7 +17,7 @@ class Member:
         self._name = name
 
     def getItems(self) -> List[Item]:
-        return self.__items
+        return self._items
 
     def setItems(self, items : List[Item]):
         self._items = items
