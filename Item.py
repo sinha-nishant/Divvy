@@ -1,33 +1,33 @@
 class Item:
     def __init__(self, name : str = "", quantity : int = 0, unit_price : float = 0):
         # String name of item
-        self.__name : str = name
+        self._name : str = name
         # Integer quantity of item
-        self.__quantity : int = quantity
+        self._quantity : int = quantity
         # Float price for a single unit
-        self.__unit_price : float = unit_price
+        self._unit_price : float = unit_price
 
     def getName(self) -> str:
-        return self.__name
+        return self._name
 
     def getQuantity(self) -> int:
-        return self.__quantity
+        return self._quantity
 
     def getUnitPrice(self) -> float:
-        return self.__unit_price
+        return self._unit_price
 
     def setName(self, name : str):
-        self.__name = name
+        self._name = name
 
     def setQuantity(self, quantity : int):
-        self.__quantity = quantity
+        self._quantity = quantity
 
     def setUnitPrice(self, unit_price : float):
-        self.__unit_price = unit_price
+        self._unit_price = unit_price
 
     def __repr__(self) -> str:
         message = ""
-        message += "Food: " + self.__name
-        message += "\n\t\tPrice: $" + str(self.__unit_price)
-        message += "\n\t\tQuantity: " + str(self.__quantity)
+        message += "Food: " + self._name
+        message += "\n\t\tPrice: $" + str(self._unit_price)
+        message += "\n\t\tQuantity: " + str(self._quantity)
         return message
