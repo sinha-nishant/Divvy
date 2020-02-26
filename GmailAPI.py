@@ -39,25 +39,15 @@ def main():
 
     service = build('gmail', 'v1', credentials=creds)
 
-    user_id= 'me'
+    user_id = 'me'
 
     # Call the Gmail API
     start = time_now()
-    results = service.users().labels().list(userId = user_id).execute()
-    label_id = results.get('labels')[3]['id']
-
-    response = service.users().messages().list(userId = user_id, labelIds=label_id).execute()
-    messages = []
-    if 'messages' in response:
-        messages.extend(response['messages'])
-
-    while 'nextPageToken' in response:
-        page_token = response['nextPageToken']
-        response = service.users().messages().list(userId=user_id, labelIds=label_id, pageToken=page_token).execute()
-        messages.extend(response['messages'])
-
-    order = service.users().messages().get(userId=user_id, id=messages[0]['id']).execute()
-
+    # Personal label ID for DoorDash
+    label_id : str = 'Label_1748595172489237696'
+    # Retrieves most recent email with the label DoorDash
+    response = service.users().messages().list(userId = user_id, labelIds = label_id, maxResults = 1).execute()
+    order = service.users().messages().get(userId=user_id, id=response['messages'][0]['id']).execute()
     print('API Response time:', time_now() - start, 'seconds')
     start = time_now()
 
@@ -68,7 +58,6 @@ def main():
     em : str = email.message_from_bytes(body).as_string()
     restaurant : str = em[:em.index('Total')].strip().split('\n')[-1].strip()
     transaction_date : str = order['payload']['headers'][1]['value'].split(';')[-1].strip()
-    del part0, body
 
     findNames = re.compile('- For: \w+ \w+ -')
     raw_names: List[str] = findNames.findall(em)
@@ -110,6 +99,6 @@ def main():
     order : Order = Order(datetime.strptime(transaction_date, '%a, %d %b %Y %H:%M:%S %z (%Z)'), restaurant, members, total_cost)
 
     print(order)
-    print('Program time excluding API Response time:',time_now() - start ,'seconds')
+    print('Program time excluding API Response time:', time_now() - start ,'seconds')
 
 main()
