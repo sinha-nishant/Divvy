@@ -13,6 +13,7 @@ from Item import Item
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+from Sheets import *
 
 def main():
     """Shows basic usage of the Gmail API.
@@ -43,8 +44,8 @@ def main():
     # Personal label ID for DoorDash
     label_id : str = 'Label_1748595172489237696'
     # Retrieves most recent email with the label DoorDash
-    response = service.users().messages().list(userId = 'me', labelIds = label_id, maxResults = 4).execute()
-    order = service.users().messages().get(userId = 'me', id = response['messages'][3]['id']).execute()
+    response = service.users().messages().list(userId = 'me', labelIds = label_id, maxResults = 5).execute()
+    order = service.users().messages().get(userId = 'me', id = response['messages'][1]['id']).execute()
     print('API Response time:', time_now() - start, 'seconds')
     start = time_now()
 
@@ -55,6 +56,7 @@ def main():
     em : str = email.message_from_bytes(body).as_string()
     restaurant : str = em[:em.index('Total')].strip().split('\n')[-1].strip()
     transaction_date : str = order['payload']['headers'][1]['value'].split(';')[-1].strip()
+    del order
 
     findNames = re.compile('- For: \w+ \w+ -')
     raw_names: List[str] = findNames.findall(em)
@@ -81,7 +83,10 @@ def main():
             quantities.append(int(elements[0]))
             foods.append(elements[1])
 
-        items : List[Item] = [Item(food, quantity, price) for food in foods for quantity in quantities for price in prices]
+        items : List[Item] = []
+        for j in range(len(foods)):
+            items.append(Item(foods[j], quantities[j], prices[j]))
+
         memberToItems[member_names[i]] = items
 
     members : List[Member] = [Member(key, memberToItems[key]) for key in memberToItems.keys()]
@@ -92,8 +97,9 @@ def main():
         members[i].setTotal((members[i].getNoTaxTotal()/subtotal) * total_cost)
 
     order : Order = Order(datetime.strptime(transaction_date, '%a, %d %b %Y %H:%M:%S %z (%Z)'), restaurant, members, total_cost)
-
     print(order)
-    print('Program time excluding API Response time:', time_now() - start ,'seconds')
+    print('Program time excluding API Response time:', time_now() - start, 'seconds')
+    mySheet= Sheets(order)
+    # mySheet.remove(0,mySheet.getSize())
 
 main()
