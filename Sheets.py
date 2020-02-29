@@ -17,7 +17,14 @@ class Sheets:
         #checking if we have correct authentification
         self._client : gspread.Client = gspread.authorize(self._creds)
         # getting access to the sheet
+        #self._ids= []
+
+        self._test= None
+
         self._sheet = self._client.open("Doordash_Records").sheet1
+        self._sh = self._client.open("Doordash_Records")
+
+        #self._ids.append(self._sheet.id)
         #storing the data within the sheet
         self._data = self._sheet.get_all_records()
         #going to add the order
@@ -28,10 +35,10 @@ class Sheets:
         #output is going to store the row which we are going to append to the sheet
         output=[]
         #stores the date of transaction
-        date : str= self.format_date()
+        date : str = self.format_date()
         output.append(date)
         #Stores restaraunt name
-        restaurant : str= self._myOrder.getRestaurant()
+        restaurant : str = self._myOrder.getRestaurant()
         output.append(restaurant)
         #gets all the people who ordered and money spent
         people : list[Member] = self._myOrder.getMembers()
@@ -46,10 +53,10 @@ class Sheets:
         # print(headings)
 
         # this is a map from member name to amount spent
-        person2Total : dict[str : float]= {}
+        person2Total : dict[str : float] = {}
         #initializing values per person to 0
         for name in headings:
-            person2Total[name]=0
+            person2Total[name] = 0
 
         for person in people:
             name : str = person.getName()
@@ -59,24 +66,25 @@ class Sheets:
                 person2Total[name]: str= person.getTotal()
                 #adding name to the sheet
                 self._sheet.update_cell(1, 3+ len(person2Total),name)
+                self._sh.worksheets()[1].update_cell(1,len(person2Total), name)
+                self._sh.worksheets()[1].update_cell(2, len(person2Total), 0)
                 #print(name, "is not a member")
+
             else:
                 #adding the value spent by the person to map
                 person2Total[name] : str =person.getTotal()
         #getting only the values of amount spent per person
         person2Total_values : list[float]= person2Total.values()
         #putting totals per person in output
+        index=1
         for value in person2Total_values:
             output.append(value)
+            self._sh.worksheets()[1].update_cell(2,index,value+ float(self._sh.worksheets()[1].cell(2,index).value))
+            index+=1
         #also adding info about the overall order total
 
         #adding to the sheet
-
-
-        self._sheet.insert_row(output,2)
-
-        # self.format()
-
+        self._sheet.insert_row(output,2, value_input_option = 'USER_ENTERED')
 
 
     def remove(self, initial: int, end:int):
@@ -87,51 +95,36 @@ class Sheets:
         return len(self._data)
 
     def format_date(self):
-        # date: str = ""
-        # date += str(self._myOrder.getDate().month)
-        # date += "/"
-        # date += str(self._myOrder.getDate().date())
-        # date += "/"
-        # date+= str(self._myOrder.getDate().year)
-
-
-        date= str(self._myOrder.getDate().date()).replace("-","/")
-        #return self._myOrder.getDate()
+        date = str(self._myOrder.getDate().date()).replace("-","/")
         return date
 
-
-    def format(self):
+    def add_sheet(self, title: str):
         service = discovery.build('sheets', 'v4', credentials=self._creds)
-        
+
         # The spreadsheet to apply the updates to.
-        spreadsheet_id = "https://docs.google.com/spreadsheets/d/1uRxor97NVAKBnljaOHr8SiJJfzN2UzQpUK8nkOTIQ5o/edit#gid=0" # TODO: Update placeholder value.
+        spreadsheet_id = '1uRxor97NVAKBnljaOHr8SiJJfzN2UzQpUK8nkOTIQ5o' # TODO: Update placeholder value.
+        # print(spreadsheet_id)
 
         batch_update_spreadsheet_request_body = {
             # A list of updates to apply to the spreadsheet.
             # Requests will be applied in the order they are specified.
             # If any request is not valid, no requests will be applied.
-
             'requests': [
                 {
-                    "repeatCell": {
-                        "range": {
-                            "sheetId" : spreadsheet_id,
-                            "startRowIndex": 1,
-                            "endRowIndex": 1000,
-                            "startColumnIndex": 0,
-                            "endColumnIndex": 1
-                        },
-                        "cell": {
-                            "userEnteredFormat": {
-                                "numberFormat": {
-                                    "type": "DATE",
-                                    "pattern": "yyyy-mm-dd"
-                                }
-                            }
-                        },
-                        "fields": "userEnteredFormat.numberFormat"
+                    "addSheet": {
+                        "properties": {
+                            "title": title,
+                            "gridProperties": {
+                                "rowCount": 1000,
+                                "columnCount": 1000
+                            },
+
+                        }
                     }
                 }
+
+
+
 
             ],  # TODO: Update placeholder value.
 
@@ -140,14 +133,17 @@ class Sheets:
 
         request = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id,
                                                      body=batch_update_spreadsheet_request_body)
+
         response = request.execute()
+        print(response['replies'][0]['addSheet']['properties']['sheetId'])
 
-        # TODO: Change code below to process the `response` dict:
+    def create(self, name:str):
+        gc = gspread.authorize(self._creds)
+        sh = gc.create('Test')
+        self._test= sh
+        sh.share('mitraarj@usc.edu', perm_type='user', role='writer')
+        return sh
 
-        pprint(response)
 
-
-
-
-
-
+    def get_all_sheets(self):
+        return self._sh.worksheets()
