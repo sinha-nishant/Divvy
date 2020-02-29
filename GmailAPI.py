@@ -74,8 +74,8 @@ def main():
     memberToItems : Dict[str: List[Item]] = dict()
     for i in range(len(member_names)):
         prices : List[float] = [float(price.lstrip('$')) for price in dollar.findall(subOrders[i])]
-        quantities : List[int] = []
-        foods : List[str] = []
+        quantities : List[int] = list()
+        foods : List[str] = list()
         raw_items : List[str] = findItem.findall(subOrders[i])
 
         for item in raw_items:
@@ -83,7 +83,7 @@ def main():
             quantities.append(int(elements[0]))
             foods.append(elements[1])
 
-        items : List[Item] = []
+        items : List[Item] = list()
         for j in range(len(foods)):
             items.append(Item(foods[j], quantities[j], prices[j]))
 

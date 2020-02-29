@@ -15,7 +15,7 @@ class Sheets:
         #get authentification for working with the google sheet
         self._creds= ServiceAccountCredentials.from_json_keyfile_name("doordash_creds.json",self._scope)
         #checking if we have correct authentification
-        self._client = gspread.authorize(self._creds)
+        self._client : gspread.Client = gspread.authorize(self._creds)
         # getting access to the sheet
         self._sheet = self._client.open("Doordash_Records").sheet1
         #storing the data within the sheet
