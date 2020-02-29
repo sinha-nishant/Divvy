@@ -44,8 +44,8 @@ def main():
     # Personal label ID for DoorDash
     label_id : str = 'Label_1748595172489237696'
     # Retrieves most recent email with the label DoorDash
-    response = service.users().messages().list(userId = 'me', labelIds = label_id, maxResults = 5).execute()
-    order = service.users().messages().get(userId = 'me', id = response['messages'][1]['id']).execute()
+    response = service.users().messages().list(userId = 'me', labelIds = label_id, maxResults = 7).execute()
+    order = service.users().messages().get(userId = 'me', id = response['messages'][5]['id']).execute()
     print('API Response time:', time_now() - start, 'seconds')
     start = time_now()
 
@@ -100,6 +100,9 @@ def main():
     print(order)
     print('Program time excluding API Response time:', time_now() - start, 'seconds')
     mySheet= Sheets(order)
+    #mySheet.add_sheet("Total Amounts")
     # mySheet.remove(0,mySheet.getSize())
-
+    #mySheet.create("Totals")
+    pprint(len(mySheet.get_all_sheets()))
+    pprint(mySheet.get_all_sheets()[1].get_all_records())
 main()
