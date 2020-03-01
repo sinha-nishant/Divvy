@@ -6,7 +6,7 @@ from googleapiclient import discovery
 # import Order
 # from datetime import datetime
 class Sheets:
-    def __init__(self, new_order : Order):
+    def __init__(self, new_order : Order = None):
         # storing the order
         self._myOrder : Order = new_order
         # this specifies the scope for the actual google sheet
