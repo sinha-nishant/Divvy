@@ -29,7 +29,7 @@ class Sheets:
         self._data = self._sheet.get_all_records()
         #going to add the order
 
-        self.add()
+        #self.add()
 
     def add(self):
         #output is going to store the row which we are going to append to the sheet
@@ -147,3 +147,15 @@ class Sheets:
 
     def get_all_sheets(self):
         return self._sh.worksheets()
+
+    def withdraw(self, name :str, value : float):
+        cell_list= self._sh.worksheets()[1].findall(name.title())
+        if len(cell_list) == 0:
+            print('Name does not exist')
+            return
+        row= cell_list[0].row
+        col= cell_list[0].col
+        initial_val= float(self._sh.worksheets()[1].cell( row +1 , col ).value
+        self._sh.worksheets()[1].update_cell(row+1,col,initial_val - value )
+
+
