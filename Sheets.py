@@ -33,6 +33,9 @@ class Sheets:
 
     def add(self):
         #output is going to store the row which we are going to append to the sheet
+        if(self._myOrder == None ):
+            print('order doesnt exist')
+            return
         output=[]
         #stores the date of transaction
         date : str = self.format_date()
@@ -155,7 +158,12 @@ class Sheets:
             return
         row= cell_list[0].row
         col= cell_list[0].col
-        initial_val= float(self._sh.worksheets()[1].cell( row +1 , col ).value
+        initial_val= float(self._sh.worksheets()[1].cell( row +1 , col ).value)
         self._sh.worksheets()[1].update_cell(row+1,col,initial_val - value )
+
+    def add_order(self,new_order):
+            self._myOrder= new_order
+
+
 
 
