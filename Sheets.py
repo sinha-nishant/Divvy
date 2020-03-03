@@ -29,7 +29,7 @@ class Sheets:
         self._data = self._sheet.get_all_records()
         #going to add the order
 
-        #self.add()
+        self.add()
 
     def add(self):
         #output is going to store the row which we are going to append to the sheet

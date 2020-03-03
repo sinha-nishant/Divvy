@@ -37,6 +37,12 @@ class Order:
     def getTotal(self) -> float:
         return self._total
 
+    @staticmethod
+    def splitTotal(members : List[Member], subtotals : List[float], totalWithTax : float):
+        subtotal = sum(subtotals)
+        for i in range(len(members)):
+            members[i].setTotal((subtotals[i]/subtotal) * totalWithTax)
+
     def __str__(self) ->  str:
         message = "Transaction Date: " +  str(self._date)
         message += "\nRestaurant: " + self._restaurant

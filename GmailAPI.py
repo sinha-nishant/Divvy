@@ -89,7 +89,7 @@ def main():
 
         memberToItems[member_names[i]] = items
 
-    members : List[Member] = [Member(key, memberToItems[key]) for key in memberToItems.keys()]
+    members : List[Member] = [Member(key.split(' ')[0], memberToItems[key]) for key in memberToItems.keys()]
 
     subtotal = sum(member.getNoTaxTotal() for member in members)
 
