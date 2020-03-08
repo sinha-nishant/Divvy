@@ -100,6 +100,7 @@ def main():
     print(order)
     print('Program time excluding API Response time:', time_now() - start, 'seconds')
     mySheet= Sheets(order)
+    mySheet.add()
     #mySheet.add_sheet("Total Amounts")
     # mySheet.remove(0,mySheet.getSize())
     #mySheet.create("Totals")

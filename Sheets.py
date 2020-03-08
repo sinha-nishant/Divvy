@@ -29,9 +29,10 @@ class Sheets:
         self._data = self._sheet.get_all_records()
         #going to add the order
 
-        self.add()
+        #self.add()
 
     def add(self):
+        updated_balance= {}
         #output is going to store the row which we are going to append to the sheet
         if(self._myOrder == None ):
             print('order doesnt exist')
@@ -82,12 +83,19 @@ class Sheets:
         index=1
         for value in person2Total_values:
             output.append(value)
-            self._sh.worksheets()[1].update_cell(2,index,value+ float(self._sh.worksheets()[1].cell(2,index).value))
+            original_balance= float(self._sh.worksheets()[1].cell(2,index).value)
+            self._sh.worksheets()[1].update_cell(2,index, original_balance + value)
+            if value !=0:
+                updated_balance[self._sh.worksheets()[1].cell(1,index).value] = value+ original_balance
             index+=1
         #also adding info about the overall order total
 
         #adding to the sheet
         self._sheet.insert_row(output,2, value_input_option = 'USER_ENTERED')
+
+        for key in updated_balance:
+            print("key= ", key, "and value= ", updated_balance[key])
+        return updated_balance
 
 
     def remove(self, initial: int, end:int):
