@@ -6,9 +6,9 @@ from googleapiclient import discovery
 # import Order
 # from datetime import datetime
 class Sheets:
-    def __init__(self, new_order : Order = None):
+    def __init__(self):
         # storing the order
-        self._myOrder : Order = new_order
+        #self._myOrder : Order = new_order
         # this specifies the scope for the actual google sheet
         self._scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
                  "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
@@ -31,7 +31,8 @@ class Sheets:
 
         #self.add()
 
-    def add(self):
+    def add(self,order):
+        self._myOrder= order
         updated_balance= {}
         #output is going to store the row which we are going to append to the sheet
         if(self._myOrder == None ):
