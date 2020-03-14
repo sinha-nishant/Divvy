@@ -3,3 +3,13 @@
 /.bashrc
 /.env
 /pyvenv.cfg
+*.pyc
+*.json
+*.py
+*.pem
+*.txt
+lib/python3.7/site-packages/
+*.pickle
+*.virtualenv
+*.png
+*.rst
