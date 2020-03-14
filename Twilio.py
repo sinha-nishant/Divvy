@@ -31,6 +31,8 @@ def add(body : List[str], resp : MessagingResponse) -> Dict[str, float]:
 
     sheets : Sheets = Sheets()
     balances: Dict[str, float] = sheets.add(Order(datetime.now(), restaurant, members, total))
+    if not balances:
+        return dict()
     print("Balances", balances)
     resp.message("\nAdded order from %s for a total of $%.2f" % (restaurant, total))
     excessive : Dict[str : float] = dict()
