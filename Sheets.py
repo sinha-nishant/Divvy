@@ -3,12 +3,9 @@ from oauth2client.service_account import ServiceAccountCredentials
 from pprint import pprint
 from Order import *
 from googleapiclient import discovery
-# import Order
-# from datetime import datetime
+
 class Sheets:
     def __init__(self):
-        # storing the order
-        #self._myOrder : Order = new_order
         # this specifies the scope for the actual google sheet
         self._scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
                  "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
@@ -16,29 +13,26 @@ class Sheets:
         self._creds= ServiceAccountCredentials.from_json_keyfile_name("doordash_creds.json",self._scope)
         #checking if we have correct authentification
         self._client : gspread.Client = gspread.authorize(self._creds)
-        # getting access to the sheet
-        #self._ids= []
 
         self._test= None
 
         self._sheet = self._client.open("Doordash_Records").sheet1
         self._sh = self._client.open("Doordash_Records")
 
-        #self._ids.append(self._sheet.id)
         #storing the data within the sheet
         self._data = self._sheet.get_all_records()
-        #going to add the order
 
-        #self.add()
 
     def add(self,order):
+        # storing the order
         self._myOrder= order
-        updated_balance= {}
-        #output is going to store the row which we are going to append to the sheet
+        # used to store value of updated balances after incorporating new order
+        updated_balance : dict[str : float]= {}
         if(self._myOrder == None ):
             print('order doesnt exist')
             return
-        output=[]
+        # output is going to store the row which we are going to append to the sheet
+        output : list=[]
         #stores the date of transaction
         date : str = self.format_date()
         output.append(date)
@@ -55,7 +49,6 @@ class Sheets:
         headings : list[str] = self._sheet.row_values(1)
         #removing the date, transaction and total headings
         del headings[0:3]
-        # print(headings)
 
         # this is a map from member name to amount spent
         person2Total : dict[str : float] = {}
@@ -73,7 +66,7 @@ class Sheets:
                 self._sheet.update_cell(1, 3+ len(person2Total),name)
                 self._sh.worksheets()[1].update_cell(1,len(person2Total), name)
                 self._sh.worksheets()[1].update_cell(2, len(person2Total), 0)
-                #print(name, "is not a member")
+
 
             else:
                 #adding the value spent by the person to map
@@ -87,6 +80,7 @@ class Sheets:
             original_balance= float(self._sh.worksheets()[1].cell(2,index).value)
             self._sh.worksheets()[1].update_cell(2,index, original_balance + value)
             if value !=0:
+                #updating balance
                 updated_balance[self._sh.worksheets()[1].cell(1,index).value] = value+ original_balance
             index+=1
         #also adding info about the overall order total
@@ -94,9 +88,7 @@ class Sheets:
         #adding to the sheet
         self._sheet.insert_row(output,2, value_input_option = 'USER_ENTERED')
 
-        for key in updated_balance:
-            print("key= ", key, "and value= ", updated_balance[key])
-        return updated_balance
+
 
 
     def remove(self, initial: int, end:int):
@@ -110,44 +102,7 @@ class Sheets:
         date = str(self._myOrder.getDate().date()).replace("-","/")
         return date
 
-    def add_sheet(self, title: str):
-        service = discovery.build('sheets', 'v4', credentials=self._creds)
 
-        # The spreadsheet to apply the updates to.
-        spreadsheet_id = '1uRxor97NVAKBnljaOHr8SiJJfzN2UzQpUK8nkOTIQ5o' # TODO: Update placeholder value.
-        # print(spreadsheet_id)
-
-        batch_update_spreadsheet_request_body = {
-            # A list of updates to apply to the spreadsheet.
-            # Requests will be applied in the order they are specified.
-            # If any request is not valid, no requests will be applied.
-            'requests': [
-                {
-                    "addSheet": {
-                        "properties": {
-                            "title": title,
-                            "gridProperties": {
-                                "rowCount": 1000,
-                                "columnCount": 1000
-                            },
-
-                        }
-                    }
-                }
-
-
-
-
-            ],  # TODO: Update placeholder value.
-
-            # TODO: Add desired entries to the request body.
-        }
-
-        request = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id,
-                                                     body=batch_update_spreadsheet_request_body)
-
-        response = request.execute()
-        print(response['replies'][0]['addSheet']['properties']['sheetId'])
 
     def create(self, name:str):
         gc = gspread.authorize(self._creds)
