@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 
@@ -52,7 +54,7 @@ def checkFloat(value : str) -> bool:
         return True
     return False
 
-@app.route("/sms", methods = ['GET', 'POST'])
+@app.route("/", methods = ['GET', 'POST'])
 def sms():
     phone = request.form['From'][:2] + " (" + request.form['From'][2:5] + ") " + request.form['From'][5:8] + "-" + request.form['From'][8:]
     contacts = dict()
@@ -96,4 +98,5 @@ def sms():
     return str(resp)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
