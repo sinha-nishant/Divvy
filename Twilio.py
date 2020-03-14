@@ -61,12 +61,14 @@ def sms():
     phone = request.form['From'][:2] + " (" + request.form['From'][2:5] + ") " + request.form['From'][5:8] + "-" + request.form['From'][8:]
     contacts = dict()
     start = time_now()
-    with open('Contacts.txt', 'r') as raw_contacts:
-        contacts_list : List[str] = raw_contacts.readlines()
-        for contact in contacts_list:
-            contact_parts : List[str] = contact.split(', ')
-            contacts[contact_parts[0]] = contact_parts[1].strip().encode('ascii', 'ignore').decode('ascii', 'ignore')
-    print("Seconds to read in contacts:", time_now() - start)
+    # with open('Contacts.txt', 'r') as raw_contacts:
+    #     contacts_list : List[str] = raw_contacts.readlines()
+    #     for contact in contacts_list:
+    #         contact_parts : List[str] = contact.split(', ')
+    #         contacts[contact_parts[0]] = contact_parts[1].strip().encode('ascii', 'ignore').decode('ascii', 'ignore')
+    # print("Seconds to read in contacts:", time_now() - start)
+
+    contacts = {"Param": os.environ.get("PARAM"), "Arjun": os.environ.get("ARJUN"), "Nishant": os.environ.get("NISHANT")}
 
     body : List[str] = request.form['Body'].split('\n')
     for i in range(len(body)):
