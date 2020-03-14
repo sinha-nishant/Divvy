@@ -105,13 +105,6 @@ class Sheets:
 
 
 
-    def create(self, name:str):
-        gc = gspread.authorize(self._creds)
-        sh = gc.create('Test')
-        self._test= sh
-        sh.share('mitraarj@usc.edu', perm_type='user', role='writer')
-        return sh
-
 
     def get_all_sheets(self):
         return self._sh.worksheets()
