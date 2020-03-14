@@ -70,6 +70,8 @@ def sms():
     # print("Seconds to read in contacts:", time_now() - start)
 
     contacts = {"Param": os.environ.get("PARAM"), "Arjun": os.environ.get("ARJUN"), "Nishant": os.environ.get("NISHANT")}
+    for key in contacts:
+        contacts[key] = contacts[key].strip().encode('ascii', 'ignore').decode('ascii', 'ignore')
 
     body : List[str] = request.form['Body'].split('\n')
     for i in range(len(body)):
