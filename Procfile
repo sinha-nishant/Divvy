@@ -1,1 +1,1 @@
-web: gunicorn Twilio:app
+web: gunicorn Twilio:app --preload --debug --log-level debug
