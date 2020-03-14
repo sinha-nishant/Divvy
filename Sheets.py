@@ -10,7 +10,7 @@ class Sheets:
         self._scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
                  "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
         #get authentification for working with the google sheet
-        self._creds= ServiceAccountCredentials.from_json_keyfile_name("doordash_creds.json",self._scope)
+        self._creds= ServiceAccountCredentials.from_json_keyfile_dict("SHEET_CREDS",self._scope)
         #checking if we have correct authentification
         self._client : gspread.Client = gspread.authorize(self._creds)
 
