@@ -52,7 +52,7 @@ def checkFloat(value : str) -> bool:
         return True
     return False
 
-@app.route("/sms", methods = ['GET', 'POST'])
+@app.route("/", methods = ['GET', 'POST'])
 def sms():
     phone = request.form['From'][:2] + " (" + request.form['From'][2:5] + ") " + request.form['From'][5:8] + "-" + request.form['From'][8:]
     contacts = dict()
