@@ -80,6 +80,7 @@ class Sheets:
                 output.append(value)
                 original_balance= float(self._sh.worksheets()[1].cell(2,index).value)
                 self._sh.worksheets()[1].update_cell(2,index, original_balance + value)
+                #
                 if value !=0:
                     #updating balance
                     updated_balance[self._sh.worksheets()[1].cell(1,index).value] = value+ original_balance
