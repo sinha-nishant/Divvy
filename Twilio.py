@@ -59,6 +59,7 @@ def checkFloat(value : str) -> bool:
 @app.route("/", methods = ['GET', 'POST'])
 def sms():
     phone = request.form['From'][:2] + " (" + request.form['From'][2:5] + ") " + request.form['From'][5:8] + "-" + request.form['From'][8:]
+    print("Phone:", phone)
     contacts = dict()
     start = time_now()
     # with open('Contacts.txt', 'r') as raw_contacts:
@@ -80,8 +81,10 @@ def sms():
 
     if command == "Credit":
         if checkFloat(body[1]):
+            print(contacts)
             for key in contacts:
                 if contacts[key] == phone:
+                    print("Found:", key, phone)
                     start = time_now()
                     credit(key, float(body[1]), resp, contacts)
                     print("Seconds to credit:", time_now() - start)
