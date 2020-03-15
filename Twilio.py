@@ -31,8 +31,10 @@ def add(body : List[str], resp : MessagingResponse) -> Dict[str, float]:
 
     sheets : Sheets = Sheets()
     balances: Dict[str, float] = sheets.add(Order(datetime.now(), restaurant, members, total))
-    print("Balances", balances)
     resp.message("\nAdded order from %s for a total of $%.2f" % (restaurant, total))
+    if not balances:
+        return dict()
+    print("Balances", balances)
     excessive : Dict[str : float] = dict()
     if 'Arjun' in balances.keys() and balances['Arjun'] > 150:
         excessive['Arjun'] = balances['Arjun']
@@ -57,14 +59,19 @@ def checkFloat(value : str) -> bool:
 @app.route("/", methods = ['GET', 'POST'])
 def sms():
     phone = request.form['From'][:2] + " (" + request.form['From'][2:5] + ") " + request.form['From'][5:8] + "-" + request.form['From'][8:]
+    print("Phone:", phone)
     contacts = dict()
     start = time_now()
-    with open('Contacts.txt', 'r') as raw_contacts:
-        contacts_list : List[str] = raw_contacts.readlines()
-        for contact in contacts_list:
-            contact_parts : List[str] = contact.split(', ')
-            contacts[contact_parts[0]] = contact_parts[1].strip().encode('ascii', 'ignore').decode('ascii', 'ignore')
-    print("Seconds to read in contacts:", time_now() - start)
+    # with open('Contacts.txt', 'r') as raw_contacts:
+    #     contacts_list : List[str] = raw_contacts.readlines()
+    #     for contact in contacts_list:
+    #         contact_parts : List[str] = contact.split(', ')
+    #         contacts[contact_parts[0]] = contact_parts[1].strip().encode('ascii', 'ignore').decode('ascii', 'ignore')
+    # print("Seconds to read in contacts:", time_now() - start)
+
+    contacts = {"Param": os.environ.get("PARAM"), "Arjun": os.environ.get("ARJUN"), "Nishant": os.environ.get("NISHANT")}
+    for key in contacts:
+        contacts[key] = contacts[key].strip().encode('ascii', 'ignore').decode('ascii', 'ignore')
 
     body : List[str] = request.form['Body'].split('\n')
     for i in range(len(body)):
@@ -76,8 +83,10 @@ def sms():
 
     if command == "Credit":
         if checkFloat(body[1]):
+            print(contacts)
             for key in contacts:
                 if contacts[key] == phone:
+                    print("Found:", key, phone)
                     start = time_now()
                     credit(key, float(body[1]), resp, contacts)
                     print("Seconds to credit:", time_now() - start)
