@@ -71,20 +71,41 @@ class Sheets:
             else:
                 #adding the value spent by the person to map
                 person2Total[name] : str =person.getTotal()
+
         #getting only the values of amount spent per person
         person2Total_values : list[float]= person2Total.values()
         #putting totals per person in output
         index=1
-        for value in person2Total_values:
-            if value !=0:
-                output.append(value)
-                original_balance= float(self._sh.worksheets()[1].cell(2,index).value)
-                self._sh.worksheets()[1].update_cell(2,index, original_balance + value)
 
-                if value !=0:
-                    #updating balance
-                    updated_balance[self._sh.worksheets()[1].cell(1,index).value] = value+ original_balance
-                index+=1
+        # for value in person2Total_values:
+        #     if value !=0:
+        #         output.append(value)
+        #         original_balance= float(self._sh.worksheets()[1].cell(2,index).value)
+        #         self._sh.worksheets()[1].update_cell(2,index, original_balance + value)
+        #         if value !=0:
+        #             #updating balance
+        #             updated_balance[self._sh.worksheets()[1].cell(1,index).value] = value+ original_balance
+        #         index+=1
+
+        
+        headings = self._sheet.row_values(1)[3:]
+        #for key in person2Total:
+           #if person2Total[key] !=0
+        for heading in headings:
+            inside= False
+            if heading not in person2Total:
+                output.append(0)
+            else:
+                output.append(person2Total[heading])
+                inside= True
+            if inside:
+                myCell = self._sh.worksheets()[1].find(heading)
+                original_balance= float(self._sh.worksheets()[1].cell(myCell.row+1,myCell.col).value)
+                self._sh.worksheets()[1].update_cell(myCell.row+1,myCell.col, original_balance + person2Total[heading])
+            index+=1
+
+
+
         #also adding info about the overall order total
 
         #adding to the sheet
