@@ -24,31 +24,28 @@ class Sheets:
 
 
     def add(self,order):
-        # storing the order
-        self._myOrder= order
+
         # used to store value of updated balances after incorporating new order
         updated_balance : dict[str : float]= {}
-        if(self._myOrder == None ):
+        if(order == None ):
             print('order doesnt exist')
             return
         # output is going to store the row which we are going to append to the sheet
         output : list=[]
         #stores the date of transaction
-        date : str = self.format_date()
+        date : str = str(order.getDate().date()).replace("-", "/")
         output.append(date)
         #Stores restaraunt name
-        restaurant : str = self._myOrder.getRestaurant()
+        restaurant : str = order.getRestaurant()
         output.append(restaurant)
         #gets all the people who ordered and money spent
-        people : list[Member] = self._myOrder.getMembers()
+        people : list[Member] = order.getMembers()
 
         #adding value of total
-        output.append(self._myOrder.getTotal())
+        output.append(order.getTotal())
 
         #this is going to be used to get all names in the sheet by retrieving the header row in the sheet
-        headings : list[str] = self._sheet.row_values(1)
-        #removing the date, transaction and total headings
-        del headings[0:3]
+        headings : list[str] = self._sheet.row_values(1)[3:]
 
         # this is a map from member name to amount spent
         person2Total : dict[str : float] = {}
@@ -73,24 +70,12 @@ class Sheets:
                 person2Total[name] : str =person.getTotal()
 
         #getting only the values of amount spent per person
+
         person2Total_values : list[float]= person2Total.values()
+
         #putting totals per person in output
         index=1
-
-        # for value in person2Total_values:
-        #     if value !=0:
-        #         output.append(value)
-        #         original_balance= float(self._sh.worksheets()[1].cell(2,index).value)
-        #         self._sh.worksheets()[1].update_cell(2,index, original_balance + value)
-        #         if value !=0:
-        #             #updating balance
-        #             updated_balance[self._sh.worksheets()[1].cell(1,index).value] = value+ original_balance
-        #         index+=1
-
-        
         headings = self._sheet.row_values(1)[3:]
-        #for key in person2Total:
-           #if person2Total[key] !=0
         for heading in headings:
             inside= False
             if heading not in person2Total:
@@ -105,9 +90,6 @@ class Sheets:
             index+=1
 
 
-
-        #also adding info about the overall order total
-
         #adding to the sheet
         self._sheet.insert_row(output,2, value_input_option = 'USER_ENTERED')
 
@@ -118,12 +100,10 @@ class Sheets:
         for row in range(initial,end+1):
             self._sheet.delete_row(row)
         print("size=",self.getSize())
+
     def getSize(self):
         return len(self._data)
 
-    def format_date(self):
-        date = str(self._myOrder.getDate().date()).replace("-","/")
-        return date
 
 
 
@@ -141,8 +121,6 @@ class Sheets:
         initial_val= float(self._sh.worksheets()[1].cell( row +1 , col ).value)
         self._sh.worksheets()[1].update_cell(row+1,col,initial_val - value )
 
-    def add_order(self,new_order):
-            self._myOrder= new_order
 
 
 
