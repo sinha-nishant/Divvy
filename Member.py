@@ -1,6 +1,8 @@
 from typing import List
 from Item import Item
 class Member:
+    # totalWithTax should not be utilized if unknown
+    # should instead be calculated through the Order class method splitTotal()
     def __init__(self, name : str = "", items : List[Item] = None, totalWithTax : float = 0):
         # String name of user
         self._name : str = name
