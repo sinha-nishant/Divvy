@@ -12,3 +12,4 @@ lib/python3.7/site-packages/
 *.virtualenv
 *.png
 *.rst
+test.py
