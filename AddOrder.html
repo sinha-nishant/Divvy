@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Add Order</title>
+<style>
+body{
+	 /* background-color: #222; */
+	 background-color: #21313C;
+    color: #e6e6e6;
+    border-color: #e6e6e6;
+    text-align:center;
+    font-size:32px;
+    
+    margin:20px;
+    
+    
+}
+.error{
+	color:#FF2400;
+	font-size:16px;
+}
+
+label{
+	color: #e6e6e6;
+	vertical-align:middle;
+	display:inline-block;
+	padding-right:200px; 
+	width:100px;
+	height:32px;
+	
+}
+
+select{
+	background-color: #20B2AA;
+	color: #e6e6e6;
+	border-radius: 20px;
+	width:135px;
+	height:32px;
+}
+
+div{
+margin-bottom: 25px;
+}
+
+input{
+	color: #e6e6e6;
+	background-color: #20B2AA;
+	border-radius: 20px;
+}
+button{
+	background-color: #20B2AA;
+	border-radius: 20px;
+    color: #e6e6e6;
+    width:135px;
+	height:50px;
+	
+}
+
+</style>
+
+</head>
+<body>
+
+	<form class="form"name="myForm" onsubmit="return validate()" >
+	<div>
+		
+		<div id="categorydiv">
+			<label id="categoryLabel" >Categories</label> 
+			<select id="categories" >
+	  			<option value="home">Home</option>
+				<option value="dining">Dining</option>
+			</select>
+		</div>
+		
+		<div id="location">
+			<label id="locationLabel" >Location/Item</label><input id="locationValue"type="text">
+		</div>
+		<div id=NishantError class="error"></div>
+		<div id="Nishant">
+			<label id="NishantLabel" >Nishant</label><input id="NishantValue"type="text">
+		</div>
+		<div id=ArjunError class="error" ></div>
+		<div id="Arjun">
+			<label id="Arjun" >Arjun</label><input id="ArjunValue" type="text">
+		</div>
+		<div id=ParamError class="error"></div>
+		<div id="Param">
+			<label id="Param">Param</label><input id="ParamValue" type="text">
+		</div>
+		<!-- <button id="addButton"onclick="addUser()">Add a new user</button> -->
+		<div id="addUser" style="display:none;">
+			<div id=usernameError class="error" ></div>
+			<div id=usertotalError class="error"></div>
+			<label id="newName" >Name</label><input value=""id="userName"type="text">
+			<br>
+			<br>
+			<label id="newValue" >Cost</label><input value=""id="userTotal"type="text">
+				
+		</div> 
+		
+		
+		<div id=totalError class="error"></div>
+		<div id="totaldiv">
+			<label id="totalLabel">TotalCost</label><input id="totalValue" type="text">
+		</div>
+		<button type="submit" >Add Order</button>
+	</div>
+	</form>
+	
+	<button id="addButton"onclick="addUser()">Add a new user</button>
+	<br>
+	<br>
+	
+	<iframe style="background: #21313C;border: none;border-radius: 2px;box-shadow: 0 2px 10px 0 rgba(70, 76, 79, .2);" width="640" height="480" src="https://charts.mongodb.com/charts-project-0-srsej/embed/charts?id=895974b1-0f6c-4019-b843-4846dccc10ac&autorefresh=28800&theme=dark"></iframe>
+<script>
+function validate(){
+	var ans= true;
+	var Nish= document.getElementById("NishantValue").value;
+	if(isNaN(Nish) || Nish ==""){
+		document.getElementById("NishantError").innerHTML= "Enter a appropriate number for Nishant";
+		ans= false;
+	}
+	else{
+		document.getElementById("NishantError").innerHTML= "";
+	}
+	var Arjun= document.getElementById("ArjunValue").value;
+	if(isNaN(Arjun) || Arjun ==""){
+		document.getElementById("ArjunError").innerHTML= "Enter a appropriate number for Arjun";
+		ans= false;
+	}
+	else{
+		document.getElementById("ArjunError").innerHTML= "";
+	}
+	
+	var Param= document.getElementById("ParamValue").value;
+	if(isNaN(Param) || Param ==""){
+		document.getElementById("ParamError").innerHTML= "Enter a appropriate number for Param";
+		ans= false;
+	} 
+	else{
+		document.getElementById("ParamError").innerHTML= "";
+	}
+	
+	if(document.getElementById("addUser").style.display ==="block"){
+		if(document.getElementById("userName").value ==""){
+		
+			document.getElementById("usernameError").innerHTML= "Enter a valid name";
+			ans=false;
+		}
+		else{
+			
+			document.getElementById("usernameError").innerHTML="";
+		}
+		var userTotal= document.getElementById("userTotal").value
+		if(isNaN(userTotal) || userTotal ==""){
+			document.getElementById("usertotalError").innerHTML= "Enter a appropriate total for the new user";
+			ans= false;
+		} 
+		else{
+			document.getElementById("usertotalError").innerHTML= "";
+		}
+	}
+	var total=document.getElementById("totalValue").value;
+	if(isNaN(total) || total ==""){
+		document.getElementById("totalError").innerHTML= "Enter a appropriate total value";
+		ans= false;
+	} 
+	else{
+		document.getElementById("totalError").innerHTML= "";
+	}
+	
+	
+	return ans;
+}
+
+
+</script>
+<script>
+ function addUser(){
+	 /* document.getElementById("addUser").style.display="none"; */
+	 var x = document.getElementById("addUser");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    document.getElementById("addButton").innerHTML= "Remove new user";
+  } else {
+    x.style.display = "none";
+    document.getElementById("addButton").innerHTML= "Add a new user";
+  }
+ }
+
+</script>
+</body>
+</html>
