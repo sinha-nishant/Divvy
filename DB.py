@@ -17,7 +17,7 @@ class DB:
             transactions = DB.orders['Transactions']
             transactions.insert_one({
                 'Date' : order.getDate(),
-                'Item' : order.getItem(),
+                'Item' : order.getProduct(),
                 'Total' : order.getTotal(),
                 'Members' : memberCosts
                 }, session = session)
