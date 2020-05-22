@@ -1,157 +1,149 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="UTF-8">
-<title>Add Order</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-<style>
-body{
-	
-	background-color: #21313C;
-    color: #e6e6e6;
-    border-color: #e6e6e6;
-    text-align:center;
-    font-size:32px;
-    
-    margin:20px;
-    
-    
-}
+	<meta charset="UTF-8">
+	<title>Add Order</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+	<style>
+		body {
 
-input{
-	text-align:center;
-}
+			background-color: #21313C;
+			color: #e6e6e6;
+			border-color: #e6e6e6;
+			text-align: center;
+			font-size: 32px;
 
-button{
-width:300px;
+			margin: 20px;
+		}
 
-}
+		input {
+			text-align: center;
+		}
 
-select{
-	text-align-last:center;
-}
+		button {
+			width: 300px;
 
+		}
 
-</style>
+		select {
+			text-align-last: center;
+		}
+	</style>
 </head>
+
 <body>
 
-	
-		<div class="container">
-            <div class="row">
-                <div class=" mx-auto text-center form p-4">
-                    <h1 class="text-truncate">Add Information For New Order</h1>
-                    <div>
-                        <form action="" class="justify-content-center">
-                            <div class="form-group">
-                                <label class="" style="">Category</label>
-                                <select id="categories" class="form-control" >
-						  			<option value="home">Home</option>
-									<option value="dining">Dining</option>
-								</select>
-                            </div>
-                            <div class="form-group">
-                                <label class="">Location</label>
-                                <input type="text" class="form-control" placeholder="Where Was The Order Placed">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="">Nishant's Amount</label>
-                                <input type="text" class="form-control" placeholder="What Was Nishant's Cost">
-                            </div>
-                            
-                             <div class="form-group">
-                                <label class="">Arjun's Amount</label>
-                                <input type="text" class="form-control" placeholder="What Was Arjun's Cost">
-                            </div>
-                            
-                             <div class="form-group">
-                                <label class="">Param's Amount</label>
-                                <input type="text" class="form-control" placeholder="What Was Param's Cost">
-                            </div>
-                            
-                            <div class="form-group collapse"  id="newUserName" aria-expanded="false"  >
-                                <label class="">New User's Name</label>
-                                <input type="text" class="form-control" placeholder="When Was The Name Of The New User">
-                               
-                                
-                            </div> 
-                            
-                           <!--  <div class="form-group collapse"  id="demo" >
+	<div class="container">
+		<div class="row">
+			<div class=" mx-auto text-center form p-4">
+				<h1 class="text-truncate">Add an Order</h1>
+				<div>
+					<form action="" class="justify-content-center">
+					
+						<div class="form-group">
+							<label class="">Date</label>
+							<input type="date" class="form-control" id="dateValue" placeholder="When Was The Order Placed">
+							<script>
+								document.getElementById('dateValue').valueAsDate = new Date();
+							</script>
+						</div>
+					
+						<div class="form-group">
+							<label class="" style="">Category</label>
+							<select id="categories" class="form-control">
+								<option value="dining">Dining</option>
+								<option value="home">Home</option>
+							</select>
+						</div>
+						
+						<div class="form-group">
+							<label class="">Location</label>
+							<input type="text" class="form-control" placeholder="Where Was The Order Placed">
+						</div>
+
+						<div class="form-group">
+							<label class="">Nishant</label>
+							<input type="text" class="form-control" placeholder="Nishant's Cost">
+						</div>
+
+						<div class="form-group">
+							<label class="">Arjun</label>
+							<input type="text" class="form-control" placeholder="Arjun's Cost">
+						</div>
+
+						<div class="form-group">
+							<label class="">Param</label>
+							<input type="text" class="form-control" placeholder="Param's Cost">
+						</div>
+
+						<div class="form-group collapse" id="newUserName" aria-expanded="false">
+							<label class="">New User's Name</label>
+							<input type="text" class="form-control" placeholder="What is the Name of the New User">
+						</div>
+
+						<!--  <div class="form-group collapse"  id="demo" >
                                 <label class="">New User's Name</label>
                                 <input type="text" class="form-control" placeholder="When Was The Name Of The New User">
                                
                                 
                             </div> -->
-                            
-                            
-                            <div class="form-group collapse" id="newUserTotal" aria-expanded="false" >
-               
-                                <label class="">New User's Total</label>
-                                <input type="text" class="form-control" placeholder="When Was The Cost For The New User">
-                                
-                            </div>
-                            
-                              <div class="form-group">
-                                <label class="">Total Cost</label>
-                                <input type="text" class="form-control" placeholder="What Was The Total Cost Of The Order">
-                            </div>
-                            
-                             <div class="form-group">
-                                <label class="">Date</label>
-                                <input type="date" class="form-control" id="dateValue" placeholder="When Was The Order Placed">
-                                <script>
-									document.getElementById('dateValue').valueAsDate = new Date();
-								</script>
-                            </div>
-                            
-                            
-                            
-                            
-                             <div class="form-group">
-                            	<button type="button"class="btn btn-primary btn-lg" style="background-color: #20B2AA;" id="addButton" data-toggle="collapse" data-target=".collapse" onclick="addUser()">Add a new User</button>
-                            </div> 
-                            
-                            <div class="form-group">
-                            	<button type="submit" class="btn btn-primary btn-lg" style="background-color: #20B2AA;">Add an Order</button>
-                            </div>
-   
-                            
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-	
-	<iframe style="background: #21313C;border: none;border-radius: 2px;box-shadow: 0 2px 10px 0 rgba(70, 76, 79, .2);" width="640" height="480" src="https://charts.mongodb.com/charts-project-0-srsej/embed/charts?id=895974b1-0f6c-4019-b843-4846dccc10ac&autorefresh=28800&theme=dark"></iframe>
-	
-<script>
- function addUser(){
 
-  var name = document.getElementById("newUserName")
-   var total = document.getElementById("newUserTotal");
+						<div class="form-group collapse" id="newUserTotal" aria-expanded="false">
 
-  if (name.getAttribute("aria-expanded")=== "false") {
-	    name.setAttribute("aria-expanded","true");
-	    total.setAttribute("aria-expanded","true");
-	    document.getElementById("addButton").innerHTML= "Remove new user";
-	  } else {
-		  name.setAttribute("aria-expanded","false");
-		  total.setAttribute("aria-expanded","false");
-	    document.getElementById("addButton").innerHTML= "Add a new user";
-	  } 
-  
-  
- 
-   
-  
- }
+							<label class="">New User's Total</label>
+							<input type="text" class="form-control" placeholder="New User's Cost">
 
-</script>	
+						</div>
+
+						<div class="form-group">
+							<label class="">Total Cost</label>
+							<input type="text" class="form-control" placeholder="Total Order Cost">
+						</div>
+						
+						<!-- User is not required to fill out this field -->
+						<div class="form-group">
+							<label class="">Comment</label>
+							<input type="text" class="form-control" placeholder="Notes on Specific Items">
+						</div>
+
+						<div class="form-group">
+							<button type="button" class="btn btn-primary btn-lg" style="background-color: #20B2AA;" id="addButton" data-toggle="collapse" data-target=".collapse" onclick="addUser()">Add a new User</button>
+						</div>
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary btn-lg" style="background-color: #20B2AA;">Add Order</button>
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<iframe style="background: #21313C;border: none;border-radius: 2px;box-shadow: 0 2px 10px 0 rgba(70, 76, 79, .2);" width="700" height="600" src="https://charts.mongodb.com/charts-project-0-srsej/embed/charts?id=895974b1-0f6c-4019-b843-4846dccc10ac&theme=dark"></iframe>
+
+	<script>
+		function addUser() {
+
+			var name = document.getElementById("newUserName")
+			var total = document.getElementById("newUserTotal");
+
+			if (name.getAttribute("aria-expanded") === "false") {
+				name.setAttribute("aria-expanded", "true");
+				total.setAttribute("aria-expanded", "true");
+				document.getElementById("addButton").innerHTML = "Remove new user";
+			} else {
+				name.setAttribute("aria-expanded", "false");
+				total.setAttribute("aria-expanded", "false");
+				document.getElementById("addButton").innerHTML = "Add a new user";
+			}
+		}
+	</script>
 </body>
+
 </html>
