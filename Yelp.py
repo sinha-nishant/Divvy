@@ -1,5 +1,6 @@
 import os
 from typing import Dict
+# GraphQL library
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 class Yelp:
@@ -32,11 +33,12 @@ class Yelp:
                     business {
                         name
                         url
-                        location {
-                            formatted_address
-                        }
                         categories {
                             title
+                        }
+                        coordinates {
+                            latitude
+                            longitude
                         }
                     }
                 }
@@ -47,14 +49,14 @@ class Yelp:
         response : Dict = Yelp.client.execute(query)
         response = response['search']['business'][0]
         search_result : Dict = dict()
+        # Name of business
         search_result['Name'] = response['name']
+        # URL for business page on Yelp
         search_result['URL'] = response['url']
-        search_result['Address'] = response['location']['formatted_address'].replace('\n', ' ')
+        search_result['Coordinates'] = {
+            'Latitude' : response['coordinates']['latitude'],
+            'Longitude' : response['coordinates']['longitude']
+        }
         # Transforms dict of category titles into list of categories
         search_result['Categories'] = [category['title'] for category in response['categories']]
         return search_result
-
-from time import time as time_now
-start = time_now()
-print(Yelp.search('whole food'))
-print(time_now() - start)
