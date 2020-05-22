@@ -1,51 +1,83 @@
-from flask import Flask, request
-from twilio.twiml.messaging_response import MessagingResponse
-
-from typing import Dict
+import os
+from datetime import datetime
+from typing import Dict, List
 
 import numexpr as ne
+from flask import Flask, request
+from twilio.twiml.messaging_response import MessagingResponse
+from twilio.rest import Client
 
-from Sheets import *
-from datetime import datetime
-
-from time import time as time_now
+from Member import Member
+from Order import Order
+from DB import DB
 
 app = Flask(__name__)
 
-def add(body : List[str], resp : MessagingResponse) -> Dict[str, float]:
-    restaurant = body[0].strip().title()
+# Formats contacts to fix encoding issues
+def formatContacts(contacts: Dict):
+    for key in contacts:
+        contacts[key] = contacts[key].strip().encode('ascii', 'ignore').decode('ascii', 'ignore')
+    return contacts
+
+# Store contacts and MessageResponse
+class Communication:
+    client = Client(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
+
+    # Read in phone numbers from environment
+    contacts : Dict = formatContacts({"Twilio" : os.environ.get("TWILIO"), "Param": os.environ.get("PARAM"), "Arjun": os.environ.get("ARJUN"), "Nishant": os.environ.get("NISHANT")})
+
+    # Message which will be sent back to member
+    resp : MessagingResponse = None
+
+    @staticmethod
+    def reply(text : str):
+        Communication.resp = MessagingResponse()
+        Communication.resp.message(text)
+
+    @staticmethod
+    def send(text : str, member_name : str):
+        Communication.client.messages.create(from_ = Communication.contacts['Twilio'],
+                                             to = Communication.contacts[member_name],
+                                             body = text)
+
+# Notifies members of their excessive balances
+def alert(excessive: List[Dict]):
+    for member in excessive:
+        if member['Name'] in Communication.contacts:
+            Communication.send("Your current balance is ${:.2f}".format(member['Balance']), member['Name'])
+
+# Adds order to spreadsheet
+def add(body : List[str]):
+    # Parse message into necessary attributes
+    item = body[0].strip().title()
     subtotals: List[float] = list()
     members: List[Member] = list()
     for i in range(1, len(body) - 1):
         parts = body[i].split(' ')
         members.append(Member(parts[0].strip()))
+        # Checks if values associated with each member is a float or a mathematical expression
         if checkFloat(parts[1].strip()):
             subtotals.append(float(parts[1].strip()))
         else:
             subtotals.append(ne.evaluate(parts[1].strip()))
 
+    # Total cost of the order
     total : float = float(body[-1].strip())
+    # Sets 'total' attribute for each member
     Order.splitTotal(members, subtotals, total)
 
-    sheets : Sheets = Sheets()
-    balances: Dict[str, float] = sheets.add(Order(datetime.now(), restaurant, members, total))
-    resp.message("\nAdded order from %s for a total of $%.2f" % (restaurant, total))
-    if not balances:
-        return dict()
-    print("Balances", balances)
-    excessive : Dict[str : float] = dict()
-    if 'Arjun' in balances.keys() and balances['Arjun'] > 150:
-        excessive['Arjun'] = balances['Arjun']
-    if 'Param' in balances.keys() and balances['Param'] > 150:
-        excessive['Param'] = balances['Param']
-    return excessive
+    excessive : List[Dict] = DB.add(Order(datetime.now(), item, members, total))
+    # Sends member a confirmation message
+    Communication.reply("\nAdded order from %s for a total of $%.2f" % (item, total))
+    alert(excessive)
 
-def credit(name : str, value : float, resp : MessagingResponse, contacts : Dict):
-    sheets : Sheets = Sheets()
-    sheets.withdraw(name, value)
-    resp.message("Credited $%.2f to your balance" % value)
-    resp.message(to = contacts['Nishant'], body = "%s credited $%.2f to their balance" % (name, value))
+# Credits balance of given member in spreadsheet
+def credit(name : str, value : float):
+    new_balance : float = DB.credit(name, value)
+    Communication.reply("Your new balance is ${:.2f}".format(new_balance))
+    Communication.send("%s credited $%.2f to their balance" % (name, value), name)
 
+# Check if given value is a float
 def checkFloat(value : str) -> bool:
     value = value.replace(".", "", 1).strip()
     if value.isdigit():
@@ -54,47 +86,40 @@ def checkFloat(value : str) -> bool:
         return True
     return False
 
-@app.route("/", methods = ['GET', 'POST'])
+# Manages two-way communication
+@app.route("/sms", methods = ['GET', 'POST'])
 def sms():
+    # Reformats phone number of member
     phone = request.form['From'][:2] + " (" + request.form['From'][2:5] + ") " + request.form['From'][5:8] + "-" + request.form['From'][8:]
-    print("Phone:", phone)
 
-    contacts = {"Param": os.environ.get("PARAM"), "Arjun": os.environ.get("ARJUN"), "Nishant": os.environ.get("NISHANT")}
-    for key in contacts:
-        contacts[key] = contacts[key].strip().encode('ascii', 'ignore').decode('ascii', 'ignore')
-
+    # Split message line by line
     body : List[str] = request.form['Body'].split('\n')
     for i in range(len(body)):
         body[i] = body[i].strip()
 
+    # Store command string
     command : str = body[0].title()
 
-    resp: MessagingResponse = MessagingResponse()
-
     if command == "Credit":
+        # If credit message is correctly formatted
         if checkFloat(body[1]):
-            print(contacts)
-            for key in contacts:
-                if contacts[key] == phone:
-                    print("Found:", key, phone)
-                    start = time_now()
-                    credit(key, float(body[1]), resp, contacts)
-                    print("Seconds to credit:", time_now() - start)
+            # Search for phone number corresponding to member
+            for key in Communication.contacts:
+                if Communication.contacts[key] == phone:
+                    # Credit balance of member who messaged
+                    credit(key, float(body[1]))
         else:
-            resp.message("The first line of your message must be 'Credit/credit' and "
+            Communication.reply("The first line of your message must be 'Credit/credit' and "
                          "the second line must be a number indicating how much you would like to credit your balance by")
     else:
-        if phone == contacts['Nishant']:
-            start = time_now()
-            excessive : Dict[str : float] = add(body, resp)
-            print("Time to add:", time_now() - start)
-            for contact in excessive:
-                phone : str = contacts[contact]
-                resp.message(to = phone, body = "Your current balance is %.2f" % excessive[contact])
+        # Restricts add authorization to phone number corresponding to Nishant
+        if phone == Communication.contacts['Nishant']:
+            # Adds order to spreadsheet
+            add(body)
         else:
-            resp.message("You only have permission to credit your balance")
+            Communication.reply("You only have permission to credit your balance")
 
-    return str(resp)
+    return str(Communication.resp)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
