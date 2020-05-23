@@ -1,8 +1,8 @@
-import os
+from os import environ
 from datetime import datetime
 from typing import Dict, List
 
-import numexpr as ne
+from numexpr import evaluate as ne_evaluate
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
@@ -20,17 +20,18 @@ def formatContacts(contacts: Dict):
 
 # Store contacts and MessageResponse
 class Communication:
-    client = Client(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
+    client = Client(environ['TWILIO_ACCOUNT_SID'], environ['TWILIO_AUTH_TOKEN'])
 
     # Read in phone numbers from environment
-    contacts : Dict = formatContacts({"Twilio" : os.environ.get("TWILIO"), "Param": os.environ.get("PARAM"), "Arjun": os.environ.get("ARJUN"), "Nishant": os.environ.get("NISHANT")})
+    contacts : Dict = formatContacts({"Twilio" : environ.get("TWILIO"), "Param": environ.get("PARAM"), "Arjun": environ.get("ARJUN"), "Nishant": environ.get("NISHANT")})
 
     # Message which will be sent back to member
     resp : MessagingResponse = None
 
     @staticmethod
     def reply(text : str):
-        Communication.resp = MessagingResponse().message(text)
+        Communication.resp = MessagingResponse()
+        Communication.resp.message(text)
 
     @staticmethod
     def send(text : str, member_name : str):
@@ -58,7 +59,7 @@ def addSMSorder(body : List[str]):
         if checkFloat(parts[1].strip()):
             subtotals[member_name] = float(parts[1].strip())
         else:
-            subtotals[member_name] = ne.evaluate(parts[1].strip())
+            subtotals[member_name] = ne_evaluate(parts[1].strip())
 
     # Total cost of the order
     total : float = float(body[-1].strip())
@@ -119,5 +120,5 @@ def sms():
     return str(Communication.resp)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

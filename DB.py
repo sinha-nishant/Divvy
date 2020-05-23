@@ -1,11 +1,12 @@
-import pymongo, os
+from pymongo import MongoClient, ReturnDocument
+from os import environ
 
 from Order import Order
 from typing import List, Dict
 
 class DB:
-    password : str = os.environ['MONGODB']
-    client : pymongo.MongoClient = pymongo.MongoClient("mongodb+srv://nishant:{}@firstcluster-b8uyp.gcp.mongodb.net/test?retryWrites=true&w=majority".format(password))
+    password : str = environ['MONGODB']
+    client : MongoClient = MongoClient("mongodb+srv://nishant:{}@firstcluster-b8uyp.gcp.mongodb.net/test?retryWrites=true&w=majority".format(password))
     # Only working with the Orders database
     orders = client['Orders']
     # Need to specify session because atomicity is necessary
@@ -42,5 +43,5 @@ class DB:
     @staticmethod
     def credit(name : str, value : float) -> float:
         members = DB.orders['Members']
-        new_balance : float = members.find_one_and_update({'Name' : name}, {'$inc' : {'Balance' : -value}}, projection = {'Balance' : 1, '_id' : 0}, upsert = True, return_document = pymongo.ReturnDocument.AFTER)['Balance']
+        new_balance : float = members.find_one_and_update({'Name' : name}, {'$inc' : {'Balance' : -value}}, projection = {'Balance' : 1, '_id' : 0}, upsert = True, return_document = ReturnDocument.AFTER)['Balance']
         return new_balance

@@ -43,7 +43,6 @@ class Order:
         for memberName in subtotals:
             memberSubtotal = subtotals[memberName]/totalNoTax * self._total
             members.append(Member(memberName, memberSubtotal))
-        print(members)
         return members
 
     def __str__(self) ->  str:
