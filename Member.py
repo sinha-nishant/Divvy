@@ -1,11 +1,9 @@
 class Member:
-    # totalWithTax should not be utilized if unknown
-    # should instead be calculated through the Order class method splitTotal()
-    def __init__(self, name : str = "", totalWithTax : float = 0):
+    def __init__(self, name : str, totalWithTax : float):
         # String name of user
         self._name : str = name
         # Float total with tax
-        self._totalWithTax = totalWithTax
+        self._totalWithTax : float = totalWithTax
 
     # Returns name of participant
     def getName(self) -> str:

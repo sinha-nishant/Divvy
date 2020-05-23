@@ -1,6 +1,7 @@
 import pymongo, os
+
 from Order import Order
-from typing import Dict
+from typing import List, Dict
 
 class DB:
     password : str = os.environ['MONGODB']
@@ -11,13 +12,13 @@ class DB:
     # Multiple document operations aren't atomic by default
     @staticmethod
     def add(order : Order):
-        memberCosts : Dict[str, float] = order.getMemberCosts()
+        memberCosts : Dict[str, float] = {member.getName() : member.getTotal() for member in order.getMembers()}
         with DB.client.start_session() as session:
             # Add order to transactions collection
             transactions = DB.orders['Transactions']
             transactions.insert_one({
                 'Date' : order.getDate(),
-                'Item' : order.getProduct(),
+                'Location' : order.getLocation(),
                 'Total' : order.getTotal(),
                 'Members' : memberCosts
                 }, session = session)
@@ -32,8 +33,10 @@ class DB:
                     {'$inc' : {'Balance' : memberCosts[member_name]}},
                     upsert = True, session = session)
 
+            # Names of members in this order
+            memberNames : List[str] = list(memberCosts.keys())
             # Returns list of dictionaries of members with excessive balances
-            return list(members.find({'$and': [{'Name': {'$in': list(memberCosts.keys())}}, {'Balance': {'$gt': 100}}]}))
+            return list(members.find({'$and': [{'Name': {'$in': memberNames}}, {'Balance': {'$gt': 100}}]}))
 
     # Don't need to specify session because single document operations are atomic
     @staticmethod

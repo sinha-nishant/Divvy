@@ -7,7 +7,6 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
 
-from Member import Member
 from Order import Order
 from DB import DB
 
@@ -31,14 +30,15 @@ class Communication:
 
     @staticmethod
     def reply(text : str):
-        Communication.resp = MessagingResponse()
-        Communication.resp.message(text)
+        Communication.resp = MessagingResponse().message(text)
 
     @staticmethod
     def send(text : str, member_name : str):
-        Communication.client.messages.create(from_ = Communication.contacts['Twilio'],
-                                             to = Communication.contacts[member_name],
-                                             body = text)
+        Communication.client.messages.create(
+            from_ = Communication.contacts['Twilio'],
+            to = Communication.contacts[member_name],
+            body = text
+        )
 
 # Notifies members of their excessive balances
 def alert(excessive: List[Dict]):
@@ -46,29 +46,26 @@ def alert(excessive: List[Dict]):
         if member['Name'] in Communication.contacts:
             Communication.send("Your current balance is ${:.2f}".format(member['Balance']), member['Name'])
 
-# Adds order to spreadsheet
-def add(body : List[str]):
+# Adds SMS order to database
+def addSMSorder(body : List[str]):
     # Parse message into necessary attributes
-    item = body[0].strip().title()
-    subtotals: List[float] = list()
-    members: List[Member] = list()
+    location = body[0].strip().title()
+    subtotals : Dict[str, float] = dict()
     for i in range(1, len(body) - 1):
         parts = body[i].split(' ')
-        members.append(Member(parts[0].strip()))
+        member_name = parts[0].strip()
         # Checks if values associated with each member is a float or a mathematical expression
         if checkFloat(parts[1].strip()):
-            subtotals.append(float(parts[1].strip()))
+            subtotals[member_name] = float(parts[1].strip())
         else:
-            subtotals.append(ne.evaluate(parts[1].strip()))
+            subtotals[member_name] = ne.evaluate(parts[1].strip())
 
     # Total cost of the order
     total : float = float(body[-1].strip())
-    # Sets 'total' attribute for each member
-    Order.splitTotal(members, subtotals, total)
 
-    excessive : List[Dict] = DB.add(Order(datetime.now(), item, members, total))
+    excessive : List[Dict] = DB.add(Order(datetime.now(), location, subtotals, total))
     # Sends member a confirmation message
-    Communication.reply("\nAdded order from %s for a total of $%.2f" % (item, total))
+    Communication.reply("\nAdded order from %s for a total of $%.2f" % (location, total))
     alert(excessive)
 
 # Credits balance of given member in spreadsheet
@@ -115,7 +112,7 @@ def sms():
         # Restricts add authorization to phone number corresponding to Nishant
         if phone == Communication.contacts['Nishant']:
             # Adds order to spreadsheet
-            add(body)
+            addSMSorder(body)
         else:
             Communication.reply("You only have permission to credit your balance")
 
