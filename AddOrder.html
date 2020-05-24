@@ -52,11 +52,11 @@ select{
                 <div class=" mx-auto text-center form p-4">
                     <h1 class="text-truncate">Add Information For New Order</h1>
                     <div>
-                        <form action="test" class="justify-content-center"  onsubmit="return validate()">
+                        <form action="#" method="POST" class="justify-content-center"  onsubmit="return validate()" >
                         
                         	<div class="form-group">
                                 <label class="">Date</label>
-                                <input type="date" class="form-control" id="dateValue" placeholder="When Was The Order Placed" id="date" required>
+                                <input type="date" class="form-control" name="date" id="dateValue" placeholder="When Was The Order Placed" id="date" required>
                              <div class="errors" id="dateError"></div>
                                 <script>
 									document.getElementById('dateValue').valueAsDate = new Date();
@@ -68,7 +68,7 @@ select{
                         
                             <div class="form-group">
                                 <label class="" style="">Category</label>
-                                <select id="categories" class="form-control" id="selectCategory" required>
+                                <select id="categories" class="form-control" id="selectCategory" name="category" required>
 						  			<option value="home">Home</option>
 									<option value="dining">Dining</option>
 								</select>
@@ -76,32 +76,32 @@ select{
                             </div>
                             <div class="form-group">
                                 <label class="">Location</label>
-                                <input type="text" class="form-control" placeholder="Where Was The Order Placed" id="orders" required>
+                                <input type="text"  name="loc"class="form-control" placeholder="Where Was The Order Placed" id="orders" required>
                             <div class="errors" id="locationError"></div>
         		
                             </div>
                             
                             <div class="form-group">
                                 <label class="">Nishant's Amount</label>
-                                <input type="text" class="form-control" placeholder="What Was Nishant's Cost" id="nishant" required>
+                                <input type="text"  name="nishant"class="form-control" placeholder="What Was Nishant's Cost" id="nishant" required>
                             <div class="errors" id="nishantError"></div>
                             </div>
                             
                              <div class="form-group">
                                 <label class="">Arjun's Amount</label>
-                                <input type="text" class="form-control" placeholder="What Was Arjun's Cost" id="arjun" required>
+                                <input type="text" name="arjun"class="form-control" placeholder="What Was Arjun's Cost" id="arjun" required>
                             <div class="errors" id="arjunError"></div>   
                             </div>
                             
                              <div class="form-group">
                                 <label class="">Param's Amount</label>
-                                <input type="text" class="form-control" placeholder="What Was Param's Cost" id="param" required>
+                                <input type="text" name="param"class="form-control" placeholder="What Was Param's Cost" id="param" required>
                             <div class="errors" id="paramError"></div>
                             </div>
                             
                             <div class="form-group collapse"  id="newUserName" aria-expanded="false"  >
                                 <label class="">New User's Name</label>
-                                <input type="text" class="form-control" placeholder="When Was The Name Of The New User" id="userName" >
+                                <input type="text" name="userName"class="form-control" placeholder="When Was The Name Of The New User" id="userName" >
                             <div class="errors" id="userNameError"></div>   
                                 
                             </div> 
@@ -110,13 +110,13 @@ select{
                             <div class="form-group collapse" id="newUserTotal" aria-expanded="false" >
                
                                 <label class="">New User's Total</label>
-                                <input type="text" class="form-control" placeholder="When Was The Cost For The New User" id="userTotal" >
-                            <div class="errors" id="userTotalError"></div>    
+                                <input type="text" name="userTotal" class="form-control" placeholder="When Was The Cost For The New User" id="userTotal" >
+                            <div class="errors"  id="userTotalError"></div>
                             </div>
                             
                               <div class="form-group">
                                 <label class="">Total Cost</label>
-                                <input type="number" class="form-control" placeholder="What Was The Total Cost Of The Order" id="total">
+                                <input type="number"  name="total"class="form-control" placeholder="What Was The Total Cost Of The Order" id="total">
                             <div class="errors" id="totalError"></div>
                             </div>
                             
