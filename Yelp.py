@@ -29,7 +29,7 @@ class Yelp:
     def search(restaurant_name : str) -> Dict:
         query = gql("""
             {
-                search(term: "%s", limit: 1, latitude: 34.020176, longitude: -118.285550) {
+                search(term: "%s", limit: 1, latitude: 34.020176, longitude: -118.285550, radius: 16093) {
                     business {
                         name
                         url

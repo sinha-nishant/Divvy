@@ -1,8 +1,9 @@
 from pymongo import MongoClient, ReturnDocument
 from os import environ
+from typing import List, Dict
 
 from Order import Order
-from typing import List, Dict
+from Yelp import Yelp
 
 class DB:
     password : str = environ['MONGODB']
@@ -34,6 +35,12 @@ class DB:
                     {'$inc' : {'Balance' : memberCosts[member_name]}},
                     upsert = True, session = session)
 
+            locations = DB.orders['Locations']
+            # Retrieves Yelp URL, categories business is relevant to, and coordinates
+            location_details : Dict = Yelp.search(order.getLocation())
+            # Inserts new location if it does not exist in database, if exists the no change
+            locations.update_one({'Name' : location_details['Name']}, {'$setOnInsert' : location_details} , upsert = True)
+
             # Names of members in this order
             memberNames : List[str] = list(memberCosts.keys())
             # Returns list of dictionaries of members with excessive balances
@@ -43,5 +50,9 @@ class DB:
     @staticmethod
     def credit(name : str, value : float) -> float:
         members = DB.orders['Members']
-        new_balance : float = members.find_one_and_update({'Name' : name}, {'$inc' : {'Balance' : -value}}, projection = {'Balance' : 1, '_id' : 0}, upsert = True, return_document = ReturnDocument.AFTER)['Balance']
+        new_balance : float = members.update_one(
+            {'Name' : name}, {'$inc' : {'Balance' : -value}},
+            projection = {'Balance' : 1, '_id' : 0},
+            upsert = True, return_document = ReturnDocument.AFTER
+        )['Balance']
         return new_balance
