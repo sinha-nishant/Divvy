@@ -16,7 +16,8 @@ class Yelp:
     transport = RequestsHTTPTransport(
         url = 'https://api.yelp.com/v3/graphql',
         headers = header,
-        use_json = True
+        use_json = True,
+        retries = 2
     )
 
     client = Client(
@@ -27,9 +28,10 @@ class Yelp:
     # Returns dictionary of required information about restaurant
     @staticmethod
     def search(restaurant_name : str) -> Dict:
+        # Search radius restricted to 10 miles
         query = gql("""
             {
-                search(term: "%s", limit: 1, latitude: 34.020176, longitude: -118.285550, radius: 16093) {
+                search(term: "%s", limit: 1, latitude: 34.020176, longitude: -118.285550, radius: 16093, sort_by: "distance") {
                     business {
                         name
                         url
