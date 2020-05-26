@@ -25,10 +25,16 @@ def home():
         print("Added user total =", newUserTotal)
         print("Total cost =", total)
 
-
         return render_template("AddOrder.html")
     else:
+        print(url_for('dashboard'))
         return render_template("AddOrder.html")
+
+
+@app.route('/Dashboard')
+def dashboard():
+    return render_template("Dashboard.html")
+
 
 if __name__ =="__main__":
     app.run()
