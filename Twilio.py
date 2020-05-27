@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Dict, List
 
 from numexpr import evaluate as ne_evaluate
-from flask import Flask, request
+from flask import Flask, request, render_template, url_for
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
 
@@ -118,6 +118,40 @@ def sms():
             Communication.reply("You only have permission to credit your balance")
 
     return str(Communication.resp)
+
+# Serves home page
+@app.route('/', methods = ['POST','GET'])
+def home():
+    if request.method == "POST":
+        # Converts string date into datetime object
+        date : datetime = datetime.strptime(request.form["date"], '%Y-%m-%d')
+        # Category is a work in progress
+        # category= request.form["category"]
+        location : str = request.form["loc"]
+        subtotals : Dict[str, float] = {
+            'Nishant': float(request.form["nishant"]),
+            'Arjun' : float(request.form["arjun"]),
+            'Param' : float(request.form["param"]),
+        }
+        newUserName = request.form["userName"]
+        if newUserName:
+            subtotals[newUserName] = float(request.form["userTotal"])
+        total = float(request.form["total"])
+
+        # Adds order to database
+        excessive: List[Dict] = DB.add(Order(date, location, subtotals, total))
+        # Sends member a confirmation message
+        Communication.reply("\nAdded order from %s for a total of $%.2f" % (location, total))
+        alert(excessive)
+        return render_template("AddOrder.html")
+    else:
+        print(url_for('dashboard'))
+        return render_template("AddOrder.html")
+
+# Serves data dashboard
+@app.route('/Dashboard')
+def dashboard():
+    return render_template("Dashboard.html")
 
 if __name__ == "__main__":
     port = int(environ.get("PORT", 5000))
