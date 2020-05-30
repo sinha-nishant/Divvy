@@ -32,7 +32,9 @@ def addWebOrder():
 def home():
     if request.method == "POST":
         addWebOrder()
-        return render_template("AddOrder.html")
+        location = request.form["loc"]
+        total = request.form["total"]
+        return render_template("Result.html", loc= location, value=total)
     else:
         return render_template("AddOrder.html")
 
