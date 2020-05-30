@@ -1,16 +1,6 @@
-from os import environ
-from datetime import datetime
 from typing import Dict, List
-
-from numexpr import evaluate as ne_evaluate
-from flask import Flask, request, render_template, url_for
 from twilio.twiml.messaging_response import MessagingResponse
-from twilio.rest import Client
-
-from Order import Order
 from DB import DB
-
-app = Flask(__name__)
 
 # Formats contacts to fix encoding issues
 def formatContacts(contacts: Dict):
@@ -20,10 +10,17 @@ def formatContacts(contacts: Dict):
 
 # Store contacts and MessageResponse
 class Communication:
+    from os import environ
+    from twilio.rest import Client
     client = Client(environ['TWILIO_ACCOUNT_SID'], environ['TWILIO_AUTH_TOKEN'])
 
     # Read in phone numbers from environment
-    contacts : Dict = formatContacts({"Twilio" : environ.get("TWILIO"), "Param": environ.get("PARAM"), "Arjun": environ.get("ARJUN"), "Nishant": environ.get("NISHANT")})
+    contacts : Dict = formatContacts({
+        "Twilio" : environ.get("TWILIO"),
+        "Param": environ.get("PARAM"),
+        "Arjun": environ.get("ARJUN"),
+        "Nishant": environ.get("NISHANT")
+    })
 
     # Message which will be sent back to member
     resp : MessagingResponse = None
@@ -59,12 +56,16 @@ def addSMSorder(body : List[str]):
         if checkFloat(parts[1].strip()):
             subtotals[member_name] = float(parts[1].strip())
         else:
-            subtotals[member_name] = ne_evaluate(parts[1].strip())
+            from numexpr import evaluate
+            subtotals[member_name] = evaluate(parts[1].strip())
 
     # Total cost of the order
     total : float = float(body[-1].strip())
 
+    from Order import Order
+    from datetime import datetime
     excessive : List[Dict] = DB.add(Order(datetime.now(), location, subtotals, total))
+
     # Sends member a confirmation message
     Communication.reply("\nAdded order from %s for a total of $%.2f" % (location, total))
     alert(excessive)
@@ -73,7 +74,7 @@ def addSMSorder(body : List[str]):
 def credit(name : str, value : float):
     new_balance : float = DB.credit(name, value)
     Communication.reply("Your new balance is ${:.2f}".format(new_balance))
-    Communication.send("%s credited $%.2f to their balance" % (name, value), name)
+    Communication.send("%s credited $%.2f to their balance" % (name, value), "Nishant")
 
 # Check if given value is a float
 def checkFloat(value : str) -> bool:
@@ -85,8 +86,8 @@ def checkFloat(value : str) -> bool:
     return False
 
 # Manages two-way communication
-@app.route("/sms", methods = ['GET', 'POST'])
 def sms():
+    from flask import request
     # Reformats phone number of member
     phone = request.form['From'][:2] + " (" + request.form['From'][2:5] + ") " + request.form['From'][5:8] + "-" + request.form['From'][8:]
 
@@ -118,41 +119,3 @@ def sms():
             Communication.reply("You only have permission to credit your balance")
 
     return str(Communication.resp)
-
-# Serves home page
-@app.route('/', methods = ['POST','GET'])
-def home():
-    if request.method == "POST":
-        # Converts string date into datetime object
-        date : datetime = datetime.strptime(request.form["date"], '%Y-%m-%d')
-        # Category is a work in progress
-        # category= request.form["category"]
-        location : str = request.form["loc"]
-        subtotals : Dict[str, float] = {
-            'Nishant': float(request.form["nishant"]),
-            'Arjun' : float(request.form["arjun"]),
-            'Param' : float(request.form["param"]),
-        }
-        newUserName = request.form["userName"]
-        if newUserName:
-            subtotals[newUserName] = float(request.form["userTotal"])
-        total = float(request.form["total"])
-
-        # Adds order to database
-        excessive: List[Dict] = DB.add(Order(date, location, subtotals, total))
-        # Sends member a confirmation message
-        Communication.reply("\nAdded order from %s for a total of $%.2f" % (location, total))
-        alert(excessive)
-        return render_template("AddOrder.html")
-    else:
-        print(url_for('dashboard'))
-        return render_template("AddOrder.html")
-
-# Serves data dashboard
-@app.route('/Dashboard')
-def dashboard():
-    return render_template("Dashboard.html")
-
-if __name__ == "__main__":
-    port = int(environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
