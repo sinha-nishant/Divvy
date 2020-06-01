@@ -31,24 +31,25 @@ def addWebOrder():
 # Serves home page
 def home():
     if request.method == "POST":
-        addWebOrder()
+        #addWebOrder()
         location = request.form["loc"]
         total = request.form["total"]
         return render_template("Result.html", loc= location, value=total)
     else:
-        return render_template("AddOrder.html")
+        # return render_template("AddOrder.html")
+        return render_template("test.html")
 
 # Serves data dashboard
 def dashboard():
     return render_template("Dashboard.html")
 
 from flask import Flask, request, render_template
-import Twilio
+#import Twilio
 
 app = Flask(__name__)
 app.add_url_rule('/', view_func = home, methods = ['GET', 'POST'])
 app.add_url_rule('/Dashboard', view_func = dashboard, methods = ['GET', 'POST'])
-app.add_url_rule('/sms', view_func = Twilio.sms, methods = ['POST'])
+#app.add_url_rule('/sms', view_func = Twilio.sms, methods = ['POST'])
 
 from os import environ
 if __name__ == "__main__":
