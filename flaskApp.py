@@ -36,8 +36,8 @@ def home():
         total = request.form["total"]
         return render_template("Result.html", loc= location, value=total)
     else:
-        # return render_template("AddOrder.html")
-        return render_template("test.html")
+        return render_template("AddOrder.html")
+        # return render_template("test.html")
 
 # Serves data dashboard
 def dashboard():

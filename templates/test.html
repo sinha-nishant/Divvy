@@ -20,15 +20,17 @@
 </head>
 
 <body>
-	Date: <input type="text" id="my_date_picker">
+	Date: <input type="date" id="my_date_picker">
 
 	<script>
+	 if ( $('#my_date_picker')[0].type != 'date' ){
 		$(document).ready(function() {
 
 			$(function() {
 				$( "#my_date_picker" ).datepicker();
 			});
 		})
+	}
 	</script>
 </body>
 
