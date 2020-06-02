@@ -14,3 +14,5 @@ lib/python3.7/site-packages/
 *.rst
 test.py
 orders.csv
+*.twb
+.DS_Store
