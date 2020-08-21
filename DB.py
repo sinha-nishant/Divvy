@@ -4,7 +4,7 @@ class DB:
     password : str = environ['MONGODB']
 
     from pymongo import MongoClient
-    client : MongoClient = MongoClient("mongodb+srv://nishant:{}@firstcluster-b8uyp.gcp.mongodb.net/test?retryWrites=true&w=majority".format(password))
+    client : MongoClient = MongoClient("mongodb+srv://python:{}@cluster0-b8uyp.azure.mongodb.net/<dbname>?retryWrites=true&w=majority".format(password))
 
     # Only working with the Orders database
     orders = client['Orders']

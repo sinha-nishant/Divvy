@@ -40,17 +40,62 @@ Future<void> _payWithVenmo() async {
   }
 }
 
-AspectRatio balanceDisplay = AspectRatio(
-    aspectRatio: 2,
-    child: Container(
-        // color: Theme.of(context).primaryColor,
-        color: Colors.black,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Balance', style: TextStyle(fontSize: 30)),
-              Text('\$130.95', style: TextStyle(fontSize: 80)),
-            ])));
+ListTile someTile = ListTile(
+    leading: Text('MAY\n25',
+        textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
+    title: Text(
+      '23rd Street Cafe',
+      textAlign: TextAlign.center,
+      style: TextStyle(color: Colors.black),
+    ),
+    trailing: Text(
+      '\$13',
+      style: TextStyle(fontSize: 15, color: Colors.black),
+    )
+    // subtitle: Text('Subtitle'),
+    );
+
+class RecentOrders {
+  static Container of(BuildContext context, double balance) {
+    return Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+            borderRadius: BorderRadius.circular(20)),
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.5,
+        child: ListView(padding: EdgeInsets.all(20), children: <Widget>[
+          someTile,
+          someTile,
+          someTile,
+          someTile,
+          someTile,
+          someTile,
+          someTile,
+          someTile,
+          someTile
+        ]));
+  }
+}
+
+class BalanceDisplay {
+  static Container of(BuildContext context, double balance) {
+    return Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.2,
+        child: Card(
+            color: Theme.of(context).accentColor,
+            shape: ContinuousRectangleBorder(
+                borderRadius: BorderRadius.circular(35)),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text('Balance',
+                      style: TextStyle(fontSize: 25, color: Colors.black)),
+                  Text('\$$balance',
+                      style: TextStyle(fontSize: 75, color: Colors.black)),
+                ])));
+  }
+}
 
 Container sendButton = Container(
     width: 80,
@@ -74,11 +119,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: sendButton,
       body: ListView(
+        padding: EdgeInsets.all(20),
+        physics: NeverScrollableScrollPhysics(),
         children: <Widget>[
-          Divider(color: Colors.white),
           Column(
-            children: <Widget>[balanceDisplay],
+            children: <Widget>[BalanceDisplay.of(context, balance)],
           ),
+          Padding(padding: EdgeInsets.all(10)),
+          RecentOrders.of(context, balance)
         ],
       ),
     );
